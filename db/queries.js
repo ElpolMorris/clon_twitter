@@ -40,10 +40,13 @@ const createUser = async (data) => {
 	}
 };
 
-const getUser = async (data) => {
+const getUser = async (data,isLogged) => {
 	const query = "SELECT * from accounts where email = $1 OR username = $1;";
 	const queryPass = "SELECT password from loginusers where id = $1";
+	const updateLastLogin =
+		"UPDATE loginusers SET last_login = now() where id = $1;";
 	try {
+		await pool.query("BEGIN")
 		//destructuring to get id + username
 		const {
 			rows: [{ id, username } = row],
@@ -55,52 +58,53 @@ const getUser = async (data) => {
 		if (!id || !username || !password) {
 			throw new Error("no existe ese registro");
 		}
+		if(!isLogged){
+			await pool.query(updateLastLogin, [id]);
+		}
 		console.log(username, password);
+		await pool.query("COMMIT")
 		return {
 			user: username,
 			password: password,
 		};
 	} catch (error) {
 		console.log(error);
+		await pool.query("ROLLBACK")
 	}
 };
 
-const getMessage = async (data) => {
-	const queryUser =
-		"SELECT id from accounts where email = $1 OR username = $1;";
-	const updateLastLogin =
-		"UPDATE loginusers SET last_login = now() where id = $1;";
-	const getTweets = "SELECT mensaje from tweets where id = $1";
+const getMessage = async () => {
+	//const getTweets = "SELECT * from tweets";
+	const getTweets = "SELECT a.username,z.mensaje,z.date_created FROM accounts AS a INNER JOIN (SELECT id_user,id_tweet,y.id,y.mensaje,y.date_created FROM accounts_tweets INNER JOIN tweets AS y ON id_tweet = y.id) AS z ON a.id = z.id_user;";
 	try {
-		await pool.query("BEGIN");
-		const {
-			rows: [{ id } = row],
-		} = await pool.query(queryUser, [data]);
-		await pool.query(updateLastLogin, [id]);
-		const {
-			rows: [mensaje],
-		} = await pool.query(getTweets, [id]);
-		await pool.query("COMMIT");
+		const { rows } = await pool.query(getTweets);
+		console.log({
+			tweet: rows ?? [],
+		})
 		return {
-			tweet: mensaje ?? [],
+			tweet: rows ?? [],
 		};
 	} catch (error) {
 		console.log(error);
-		await pool.query("ROLLBACK");
 	}
 };
 const createTweet = async (data) => {
 	const [user, tweet] = data;
 	const queryCreateTweet =
-		"INSERT INTO tweets (id,mensaje,date_created) VALUES ($1,$2,now());";
+		"INSERT INTO tweets (mensaje,date_created) VALUES ($1,now()) returning id;";
+	const queryAccountsTweets =
+		"INSERT INTO accounts_tweets (id_user,id_tweet) VALUES ($1,$2)";
 	const queryUser =
 		"SELECT id from accounts where email = $1 OR username = $1;";
 	try {
 		await pool.query("BEGIN");
 		const {
-			rows: [{ id } = row],
+			rows: [{ id: iduser } = row],
 		} = await pool.query(queryUser, [user]);
-		await pool.query(queryCreateTweet, [id, tweet]);
+		const {
+			rows: [{ id: idtweet } = row],
+		} = await pool.query(queryCreateTweet, [tweet]);
+		await pool.query(queryAccountsTweets, [iduser, idtweet]);
 		await pool.query("COMMIT");
 		return true;
 	} catch (error) {
@@ -108,5 +112,4 @@ const createTweet = async (data) => {
 		await pool.query("ROLLBACK");
 	}
 };
-
-module.exports = { createUser, getMessage, getUser, createUser };
+module.exports = { createUser, getMessage, getUser, createTweet };

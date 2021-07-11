@@ -11,7 +11,7 @@ const {
 	createTweet,
 	getMessage,
 	getUser,
-} = require("../db/prueba_queries");
+} = require("../db/queries");
 
 
 

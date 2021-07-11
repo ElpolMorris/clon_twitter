@@ -5,8 +5,8 @@ const jsonwebtoken = require("jsonwebtoken");
 
 const generateToken = ({ user, password }) => {
 	const payload = {
-		user,
-		password,
+		user:user,
+		password:password,
 	};
 	return jsonwebtoken.sign(payload, "SECRET");
 };

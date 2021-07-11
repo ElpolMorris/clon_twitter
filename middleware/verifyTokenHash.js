@@ -7,9 +7,8 @@ const verifyTokenHash = async(req,res,next,getUser)=>{
     //res.status(403).send("No posee token valido")
     const token = data.replace("Bearer ", "");
     const { user, password } = verifyToken(token);
-
-    if ((user, password)) {
-        let { username, password: passHash } = await getUser(user);
+    if ((user && password)) {
+        let { user:username, password: passHash } = await getUser(user);
         if (passHash) {
             const isValid = await compareHash(password, passHash);
             if (isValid) {
