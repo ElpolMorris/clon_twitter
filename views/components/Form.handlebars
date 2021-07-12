@@ -1,0 +1,11 @@
+<div class="{{class}}">
+    <form>
+        {{#each inputs}}                   
+            {{>Input
+                name-input= this.nameInput
+                type-input= this.type
+                text-label= this.label
+            }}
+        {{/each}}
+    </form>
+</div>

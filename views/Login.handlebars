@@ -1,0 +1,51 @@
+<div class="container flex f-column p-3 mobile">
+    <div>
+
+    {{> Logo 
+        hex-color = "#fff"
+    }}
+    </div>
+
+    <h1 class="isLetterWhite">Iniciar sesión en "Twitter"</h1>
+    {{> Form
+    class = "isLetterWhite"
+    textButton = "Iniciar Sesión"
+    }}
+    
+    {{>Button
+    class="btn btn-primary"
+    btn-name= "Iniciar Sesión"
+    }}
+    <div class="text-center p-1">
+            <span class="text-primary">¿No tienes cuenta?</span> 
+            <a class="link text-primary" href="/register">Regístrate en "Twitter"!</a>
+    </div>
+
+</div>
+<script>
+    const btnLogin = document.querySelector("button")
+    const inputs = document.querySelectorAll("input")
+    btnLogin.addEventListener("click",async()=>{
+        const [user,password] = [...inputs].map(({value}) => value)
+        const borrar = await loginUser(user,password)
+    })
+    const loginUser = async(user,password)=>{
+        try{
+            const {data} = await axios.post("http://localhost:3000/login",{
+                user:user,
+                password:password
+            })
+            if(data){
+                localStorage.setItem("token",data)
+                location.replace("http://localhost:3000/home")
+            }
+            else {
+                throw new Error("Sus credenciales son incorrectas")
+            }
+        }catch(error){
+            console.log(error)
+        }
+        
+        
+    }
+</script>

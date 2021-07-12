@@ -2,7 +2,8 @@ const { compareHash } = require("../utils/bcrypt");
 const { verifyToken } = require("../utils/jwt");
 
 const verifyTokenHash = async(req,res,next,getUser)=>{
-    const data = req.headers["authorization"];
+    const data = await req.headers["Authorization"];
+    console.log("data?",data)
     if(!data) res.redirect("http://localhost:3000/login"); 
     //res.status(403).send("No posee token valido")
     const token = data.replace("Bearer ", "");

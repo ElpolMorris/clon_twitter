@@ -38,7 +38,7 @@ const login = (app, getUser) => {
 		const { user, password } = req.body;
 		//simulación búsqueda en base de datos
 		try {
-			let { user:username, password: passHash } = await getUser(user);
+			let { username, password: passHash } = await getUser(user);
 			if (passHash) {
 				const isValid = await compareHash(password, passHash);
 				if (isValid) {
@@ -56,7 +56,7 @@ const login = (app, getUser) => {
 	});
 };
 
-const home = (app, getUser,getMessage,createTweet) => {
+const home = (app, getUser,getMessage,crearTweet) => {
 	app.use("/home", async (req, res, next) => {
 		try {
             verifyTokenHash(req, res, next,getUser)
@@ -68,7 +68,7 @@ const home = (app, getUser,getMessage,createTweet) => {
 		const { user } = req;
         //get mensajes del usuario
         console.log(user)
-        const tweets = await getMessage()
+        const tweets = await getMessage(user)
         console.log(tweets)
 		res.send(tweets);
 	});
@@ -76,7 +76,7 @@ const home = (app, getUser,getMessage,createTweet) => {
         const { user } = req;
         const { tweet } = req.body
         if(tweet.length <= 250 && tweet.length > 0 && tweet){
-            const nuevoTweet = await createTweet([user,tweet])
+            const nuevoTweet = await crearTweet([user,tweet])
             if(nuevoTweet){
                 res.status(201).send("Tweet creado exitosamente")
             }else{

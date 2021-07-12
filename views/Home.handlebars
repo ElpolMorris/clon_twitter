@@ -1,0 +1,72 @@
+<div class="container">
+    {{> Header}}
+    {{>Tweets 
+        nombre-usuario = "pablo"
+        tweet-contenido = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam laborum voluptatibus sed ad laudantium quos vel deleniti officia. Qui illum totam, quod incidunt aut eveniet accusantium cumque asperiores amet sunt!"
+    }}
+    {{>Tweets 
+        nombre-usuario = "pablo"
+        tweet-contenido = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam laborum voluptatibus sed ad laudantium quos vel deleniti officia. Qui illum totam, quod incidunt aut eveniet accusantium cumque asperiores amet sunt!"
+    }}
+    {{>Tweets 
+        nombre-usuario = "pablo"
+        tweet-contenido = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam laborum voluptatibus sed ad laudantium quos vel deleniti officia. Qui illum totam, quod incidunt aut eveniet accusantium cumque asperiores amet sunt!"
+    }}
+    {{>Tweets 
+        nombre-usuario = "pablo"
+        tweet-contenido = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam laborum voluptatibus sed ad laudantium quos vel deleniti officia. Qui illum totam, quod incidunt aut eveniet accusantium cumque asperiores amet sunt!"
+    }}
+    {{>Tweets 
+        nombre-usuario = "pablo"
+        tweet-contenido = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam laborum voluptatibus sed ad laudantium quos vel deleniti officia. Qui illum totam, quod incidunt aut eveniet accusantium cumque asperiores amet sunt!"
+    }}
+    {{>Tweets 
+        nombre-usuario = "pablo"
+        tweet-contenido = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam laborum voluptatibus sed ad laudantium quos vel deleniti officia. Qui illum totam, quod incidunt aut eveniet accusantium cumque asperiores amet sunt!"
+    }}
+    {{>Tweets 
+        nombre-usuario = "pablo"
+        tweet-contenido = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam laborum voluptatibus sed ad laudantium quos vel deleniti officia. Qui illum totam, quod incidunt aut eveniet accusantium cumque asperiores amet sunt!"
+    }}
+    {{>Tweets 
+        nombre-usuario = "pablo"
+        tweet-contenido = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam laborum voluptatibus sed ad laudantium quos vel deleniti officia. Qui illum totam, quod incidunt aut eveniet accusantium cumque asperiores amet sunt!"
+    }}
+    {{> Modal}}
+</div>
+<script>
+
+    (async() => {
+        alert()
+        const token = localStorage.getItem("token")
+        if(!token){
+            location.replace("http://localhost:3000/login")
+        }
+        const {data} = await axios.post("http://localhost:3000/verify",token)
+        if(!data){
+            localStorage.removeItem("token")
+            location.replace("http://localhost:3000/login")
+        }
+    })()
+
+    const btnTweet = document.querySelector("#btn-tweet")
+    const closeModal = document.querySelector("#close-modal")
+    const modal = document.querySelector(".modal")
+    const cerrarSesion = document.querySelector("button")
+    btnTweet.addEventListener("click",()=>{
+        modal.classList.remove("d-none")
+    })
+    closeModal.addEventListener("click",()=>{
+        modal.classList.add("d-none")
+    })
+    modal.addEventListener("click",(e)=>{
+        if(modal === e.target) {
+            // put your code here
+            modal.classList.add("d-none")
+        }
+    })
+    cerrarSesion.addEventListener("click",()=>{
+        localStorage.removeItem("token")
+        location.reload()
+    })
+</script>
