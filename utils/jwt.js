@@ -11,8 +11,8 @@ const generateToken = ({ user, password }) => {
 	return jsonwebtoken.sign(payload, "SECRET");
 };
 const verifyToken = (token) => {
-    const hola = jsonwebtoken.verify(token,"SECRET")
-    return hola
+    const verificated = jsonwebtoken.verify(token,"SECRET")
+    return verificated
 }
 module.exports = { 
     generateToken,

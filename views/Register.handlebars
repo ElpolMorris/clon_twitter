@@ -1,9 +1,9 @@
 <div class="container flex f-column p-3 mobile">
     <div>
 
-    {{> Logo
+        {{> Logo
         hex-color = "#fff"
-    }}
+        }}
     </div>
 
     <h1 class="isLetterWhite">Crea tu cuenta</h1>
@@ -15,3 +15,31 @@
     btn-name= "Iniciar Sesión"
     }}
 </div>
+
+<script>
+    const btnLogin = document.querySelector("button")
+    const inputs = document.querySelectorAll("input")
+    btnLogin.addEventListener("click", async () => {
+        const [name, email, username, password] = [...inputs].map(({ value }) => value)
+        const registro = await register([name, email, username, password])
+    })
+    const register = async (dataRegister) => {
+        const [name, email, username, password] = dataRegister
+        try {
+            const data = await axios.post("http://localhost:3000/register", {
+                name: name,
+                email: email,
+                password: password,
+                username: username
+            })
+            if(data.status === 200){
+                alert("usuario creado con éxito")
+                location.replace("http://localhost:3000/login")
+            }
+        } catch (error) {
+            if (error.response === 400) {                
+                alert("Usuario ya registrado")
+            }
+        }
+    }
+</script>

@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const dotenv = require("dotenv");
 dotenv.config();
-const { register, home, login } = require("../router/router");
+const { register, home, login, verify } = require("../router/router");
 const PORT = process.env.PORT || 3000;
 const exphbs  = require('express-handlebars');
 //simulacion bbdd
@@ -91,7 +91,8 @@ app.get("/prueba",(req,res)=>{
 //funciones de prueba
 const dataRender = {
 	inputs: [
-		{
+		{	
+			"textarea":"true",
 			"nameInput": "Tweet",
 			"type": "textarea",
 			"label": "Escribe lo que piensas"
@@ -101,4 +102,9 @@ const dataRender = {
 //
 register(app, createUser);
 login(app, getUser);
-home(app, getUser, getMessage, createTweet,dataRender);
+home(app, getMessage, createTweet,dataRender,getUser);
+verify(app,getUser)
+
+app.get("*",(req,res)=>{
+	res.redirect("/")
+})

@@ -26,7 +26,6 @@ const createUser = async (data) => {
 		const {
 			rows: [{ id } = row],
 		} = await pool.query(queryInsertUser, [email, username]);
-		console.log(id);
 		const insertName = await pool.query(queryInsertName, [id, name]);
 		const insertPassword = await pool.query(queryInsertPassword, [
 			id,
@@ -61,7 +60,6 @@ const getUser = async (data,isLogged) => {
 		if(!isLogged){
 			await pool.query(updateLastLogin, [id]);
 		}
-		console.log(username, password);
 		await pool.query("COMMIT")
 		return {
 			user: username,
@@ -74,13 +72,9 @@ const getUser = async (data,isLogged) => {
 };
 
 const getMessage = async () => {
-	//const getTweets = "SELECT * from tweets";
-	const getTweets = "SELECT a.username,z.mensaje,z.date_created FROM accounts AS a INNER JOIN (SELECT id_user,id_tweet,y.id,y.mensaje,y.date_created FROM accounts_tweets INNER JOIN tweets AS y ON id_tweet = y.id) AS z ON a.id = z.id_user;";
+	const getTweets = "SELECT a.username,z.mensaje,z.date_created FROM accounts AS a INNER JOIN (SELECT id_user,id_tweet,y.id,y.mensaje,y.date_created FROM accounts_tweets INNER JOIN tweets AS y ON id_tweet = y.id) AS z ON a.id = z.id_user ORDER BY date_created desc;";
 	try {
 		const { rows } = await pool.query(getTweets);
-		console.log({
-			tweet: rows ?? [],
-		})
 		return {
 			tweet: rows ?? [],
 		};

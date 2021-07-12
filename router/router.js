@@ -26,7 +26,7 @@ const register = (app, createUser) => {
 			if (!data) {
 				res.status(400).send("usuario ya registrado");
 			} else {
-				res.status(200).send("registrado de manera pulenta");
+				res.status(200).send("registrado de manera exitosa");
 			}
 		} catch (e) {
 			res.status(500).send(e);
@@ -38,7 +38,7 @@ const login = (app, getUser) => {
 		const { user, password } = req.body;
 		//simulación búsqueda en base de datos
 		try {
-			let { username, password: passHash } = await getUser(user);
+			let { user: username, password: passHash } = await getUser(user);
 			if (passHash) {
 				const isValid = await compareHash(password, passHash);
 				if (isValid) {
@@ -48,7 +48,7 @@ const login = (app, getUser) => {
 					res.status(403).send("credenciales incorrectas");
 				}
 			} else {
-				throw new Error("tamos mal");
+				throw new Error("Credenciales faltantes");
 			}
 		} catch (error) {
 			res.status(403).send(`Error: ${error.message}`);
@@ -56,25 +56,29 @@ const login = (app, getUser) => {
 	});
 };
 
-const home = (app, getUser,getMessage,crearTweet) => {
-	app.use("/home", async (req, res, next) => {
-		try {
-            verifyTokenHash(req, res, next,getUser)
-		} catch (error) {
-            res.redirect("http://localhost:3000/login");
-        }
-	});
+const home = (app,getMessage,crearTweet,dataRender,getUser) => {
+	// app.use("/home", async (req, res, next) => {
+	// 	try {
+    //         verifyTokenHash(req, res, next,getUser)
+	// 	} catch (error) {
+    //         res.redirect("http://localhost:3000/login");
+    //     }
+	// });
 	app.get("/home", async(req, res) => {
-		const { user } = req;
-        //get mensajes del usuario
-        console.log(user)
-        const tweets = await getMessage(user)
-        console.log(tweets)
-		res.send(tweets);
+		// const { user } = req;
+        // //get mensajes del usuario
+        // console.log(user)
+        const tweets = await getMessage()
+        // console.log(tweets)
+		//res.render(tweets);
+		res.render("Home",{
+			...dataRender,
+			...tweets
+		})
 	});
     app.post("/home",async(req,res)=>{
-        const { user } = req;
-        const { tweet } = req.body
+        const { tweet,token } = req.body
+		const user = await verifyTokenHash(token,getUser,res)
         if(tweet.length <= 250 && tweet.length > 0 && tweet){
             const nuevoTweet = await crearTweet([user,tweet])
             if(nuevoTweet){
@@ -87,8 +91,20 @@ const home = (app, getUser,getMessage,crearTweet) => {
         }
     })
 };
+const verify = (app, getUser) => {	
+	app.post("/verify",(req,res)=>{
+		const {token} = req.body
+		try {
+            const username = verifyTokenHash(token,getUser)
+			res.status(200).send(username)
+		} catch (error) {
+            res.redirect("http://localhost:3000/login");
+        }
+	})
+}
 module.exports = {
 	register,
 	home,
 	login,
+	verify
 };

@@ -1,25 +1,26 @@
 const { compareHash } = require("../utils/bcrypt");
 const { verifyToken } = require("../utils/jwt");
 
-const verifyTokenHash = async(req,res,next,getUser)=>{
-    const data = await req.headers["Authorization"];
-    console.log("data?",data)
-    if(!data) res.redirect("http://localhost:3000/login"); 
-    //res.status(403).send("No posee token valido")
-    const token = data.replace("Bearer ", "");
+const verifyTokenHash = async(token,getUser)=>{
+    //const data = req.body;
+    if(!token){
+        throw new Error("token no válido")
+        //res.status(403).send("No posee token valido")
+    }
     const { user, password } = verifyToken(token);
     if ((user && password)) {
         let { user:username, password: passHash } = await getUser(user);
         if (passHash) {
             const isValid = await compareHash(password, passHash);
             if (isValid) {
-                req.user = username
-                next();
+                return username
+                //res.status(200).send(username)
             } else {
-                res.redirect("http://localhost:3000/login");
+                throw new Error("token no válido")
+                //res.status(403).send("No posee token valido");
             }
         } else {
-            res.redirect("http://localhost:3000/login");
+            throw new Error("token no válido")
             //res.status(403).send("No posee token valido");
         }
     }

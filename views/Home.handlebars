@@ -1,72 +1,99 @@
-<div class="container">
+<div class="container d-none" id="containerPrincipal">
     {{> Header}}
-    {{>Tweets 
-        nombre-usuario = "pablo"
-        tweet-contenido = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam laborum voluptatibus sed ad laudantium quos vel deleniti officia. Qui illum totam, quod incidunt aut eveniet accusantium cumque asperiores amet sunt!"
+    {{#each tweet}}
+    {{> Tweets
+    nombre-usuario = this.username
+    tweet-contenido = this.mensaje
     }}
-    {{>Tweets 
-        nombre-usuario = "pablo"
-        tweet-contenido = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam laborum voluptatibus sed ad laudantium quos vel deleniti officia. Qui illum totam, quod incidunt aut eveniet accusantium cumque asperiores amet sunt!"
-    }}
-    {{>Tweets 
-        nombre-usuario = "pablo"
-        tweet-contenido = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam laborum voluptatibus sed ad laudantium quos vel deleniti officia. Qui illum totam, quod incidunt aut eveniet accusantium cumque asperiores amet sunt!"
-    }}
-    {{>Tweets 
-        nombre-usuario = "pablo"
-        tweet-contenido = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam laborum voluptatibus sed ad laudantium quos vel deleniti officia. Qui illum totam, quod incidunt aut eveniet accusantium cumque asperiores amet sunt!"
-    }}
-    {{>Tweets 
-        nombre-usuario = "pablo"
-        tweet-contenido = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam laborum voluptatibus sed ad laudantium quos vel deleniti officia. Qui illum totam, quod incidunt aut eveniet accusantium cumque asperiores amet sunt!"
-    }}
-    {{>Tweets 
-        nombre-usuario = "pablo"
-        tweet-contenido = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam laborum voluptatibus sed ad laudantium quos vel deleniti officia. Qui illum totam, quod incidunt aut eveniet accusantium cumque asperiores amet sunt!"
-    }}
-    {{>Tweets 
-        nombre-usuario = "pablo"
-        tweet-contenido = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam laborum voluptatibus sed ad laudantium quos vel deleniti officia. Qui illum totam, quod incidunt aut eveniet accusantium cumque asperiores amet sunt!"
-    }}
-    {{>Tweets 
-        nombre-usuario = "pablo"
-        tweet-contenido = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam laborum voluptatibus sed ad laudantium quos vel deleniti officia. Qui illum totam, quod incidunt aut eveniet accusantium cumque asperiores amet sunt!"
-    }}
+    {{/each}}
     {{> Modal}}
+</div>
+<div class="container flex f-column p-3 mobile " id="loader">
+    {{> Logo
+        hex-color= "#fff"
+    }}
+    <span class="isLetterWhite">Cargando...</span>
 </div>
 <script>
 
-    (async() => {
-        alert()
-        const token = localStorage.getItem("token")
-        if(!token){
-            location.replace("http://localhost:3000/login")
-        }
-        const {data} = await axios.post("http://localhost:3000/verify",token)
-        if(!data){
+        //console.log(containerPrincipal,loader)
+    (async () => {
+        try {
+        const containerPrincipal = document.querySelector("#containerPrincipal")
+        const loader = document.querySelector("#loader")
+            const token = localStorage.getItem("token")
+            if (!token) {
+                location.replace("http://localhost:3000/login")
+            }
+            console.log(token)
+            const { data } = await axios.post("http://localhost:3000/verify", {
+                token: token
+            })
+            console.log(data)
+            if (!data) {
+                throw new Error("Autenticacion fallida")
+            }
+            console.log(data)
+            console.log("pase")
+            loader.style.display = "none"
+            console.log("pase2")
+            containerPrincipal.style.display = "block"
+
+            localStorage.setItem("user", data)
+        } catch (error) {
             localStorage.removeItem("token")
+            localStorage.removeItem("user")
+            console.log(error)
             location.replace("http://localhost:3000/login")
         }
     })()
 
     const btnTweet = document.querySelector("#btn-tweet")
+    const sendTweet = document.querySelector(".modal-container > .text-center > .text-center > button")
     const closeModal = document.querySelector("#close-modal")
     const modal = document.querySelector(".modal")
+    const header = document.querySelector("header")
     const cerrarSesion = document.querySelector("button")
-    btnTweet.addEventListener("click",()=>{
+    const inputTweet = document.querySelector("textarea")
+    btnTweet.addEventListener("click", () => {
         modal.classList.remove("d-none")
     })
-    closeModal.addEventListener("click",()=>{
+    closeModal.addEventListener("click", () => {
         modal.classList.add("d-none")
     })
-    modal.addEventListener("click",(e)=>{
-        if(modal === e.target) {
+    modal.addEventListener("click", (e) => {
+        if (modal === e.target) {
             // put your code here
             modal.classList.add("d-none")
         }
     })
-    cerrarSesion.addEventListener("click",()=>{
+    cerrarSesion.addEventListener("click", () => {
         localStorage.removeItem("token")
         location.reload()
+    })
+    sendTweet.addEventListener("click", async () => {
+        const tweetContent = `${inputTweet.value}`
+        const token = localStorage.getItem("token")
+
+
+        try {
+            if (!tweetContent) {
+                throw new Error("No se puede crear un tweet sin contenido")
+            }
+            if (tweetContent.length > 250) {
+                inputTweet.value = ""
+                throw new Error("Longitud máxima sobrepasada")
+            }
+
+            const { data } = axios.post("http://localhost:3000/home", {
+                token: token,
+                tweet: tweetContent
+            })
+
+            modal.classList.add("d-none")
+            location.reload()
+        } catch (error) {
+            alert(error.message)
+        }
     })
 </script>
