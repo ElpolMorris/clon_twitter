@@ -10,7 +10,8 @@
     margin: 0px;
     box-sizing: border-box;
     font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto;
-    background-color: var(--dark-bg)
+    background-color: var(--dark-bg);
+    font-size: 0.9rem;
 }
 
 /*Estilos estándar*/

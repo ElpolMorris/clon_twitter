@@ -19,9 +19,21 @@
 <script>
     const btnLogin = document.querySelector("button")
     const inputs = document.querySelectorAll("input")
+
+
     btnLogin.addEventListener("click", async () => {
         const [name, email, username, password] = [...inputs].map(({ value }) => value)
-        const registro = await register([name, email, username, password])
+        if (!name || !email || !username || !password) {
+            alert("Se deben llenar todos los campos")
+        } else {
+            const validation = isEmailValidated(email)
+            if (validation) {
+                const registro = await register([`${name}`, `${email}`, `${username}`, `${password}`])
+            }
+            else {
+                alert("Correo no válido")
+            }
+        }
     })
     const register = async (dataRegister) => {
         const [name, email, username, password] = dataRegister
@@ -32,14 +44,21 @@
                 password: password,
                 username: username
             })
-            if(data.status === 200){
+            if (data.status === 200) {
                 alert("usuario creado con éxito")
                 location.replace("http://localhost:3000/login")
             }
         } catch (error) {
-            if (error.response === 400) {                
+            if (error.response.status === 400) {
+                inputs.forEach( input => input.value = "")
                 alert("Usuario ya registrado")
             }
         }
+    }
+    const isEmailValidated = (email) => {
+        if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(email)) {
+            return true
+        }
+        return false
     }
 </script>
