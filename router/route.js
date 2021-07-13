@@ -1,25 +1,15 @@
 const { hashPass, compareHash } = require("../utils/bcrypt");
 const { generateToken, verifyToken } = require("../utils/jwt");
 const{verifyTokenHash,isAllDataRight} = require("../middleware/verifyTokenHash")
+
+
 const register = (app, createUser) => {
-	app.use("/register", (req, res, next) => {
-		// const { name, username, email, password } = req.body;
-		// const isAllData = [name, username, email, password].every((d) => {
-		// 	let dStringify = `${d}`;
-		// 	let wrapObject = dStringify.includes("{" || "}");
-		// 	return d && d.length > 0 && !wrapObject;
-		// });
-		// if (!isAllData) {
-		// 	res
-		// 		.status(400)
-		// 		.send("los datos enviados no son del tipo correspondiente");
-		// }
-		// next();
-        isAllDataRight(req, res, next)
+	app.use("/register", (req, res, next) => {		
+        isAllDataRight(req, res, next) //verifica que toda la información requerida sea true
 	});
 	app.post("/register", async (req, res) => {
 		const { name, username, email, password } = req.body;
-		//simulacion registro en base de datos
+		//registro en base de datos
 		try {
 			const newPass = await hashPass(password);
 			const data = await createUser([name, username, email, newPass]);
@@ -36,7 +26,7 @@ const register = (app, createUser) => {
 const login = (app, getUser) => {
 	app.post("/login", async (req, res) => {
 		const { user, password } = req.body;
-		//simulación búsqueda en base de datos
+		//Búsqueda en base de datos
 		try {
 			let { user: username, password: passHash } = await getUser(user);
 			if (passHash) {
@@ -57,20 +47,9 @@ const login = (app, getUser) => {
 };
 
 const home = (app,getMessage,crearTweet,dataRender,getUser) => {
-	// app.use("/home", async (req, res, next) => {
-	// 	try {
-    //         verifyTokenHash(req, res, next,getUser)
-	// 	} catch (error) {
-    //         res.redirect("http://localhost:3000/login");
-    //     }
-	// });
 	app.get("/home", async(req, res) => {
-		// const { user } = req;
-        // //get mensajes del usuario
-        // console.log(user)
+		//obtener todos los tweets
         const tweets = await getMessage()
-        // console.log(tweets)
-		//res.render(tweets);
 		res.render("Home",{
 			...dataRender,
 			...tweets
@@ -91,7 +70,8 @@ const home = (app,getMessage,crearTweet,dataRender,getUser) => {
         }
     })
 };
-const verify = (app, getUser) => {	
+const verify = (app, getUser) => {
+	//ruta de verificación del home	
 	app.post("/verify",(req,res)=>{
 		const {token} = req.body
 		try {

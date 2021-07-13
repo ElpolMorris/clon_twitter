@@ -1,3 +1,4 @@
+{{!-- vista home --}}
 <div class="container d-none" id="containerPrincipal">
     {{> Header}}
     {{#each tweet}}
@@ -8,37 +9,32 @@
     {{/each}}
     {{> Modal}}
 </div>
-<div class="container flex f-column p-3 mobile " id="loader">
+
+{{!-- loader --}}
+<div class="container-load flex f-column center-layout p-3 mobile " id="loader">
     {{> Logo
-        hex-color= "#fff"
+    hex-color= "#fff"
     }}
     <span class="isLetterWhite">Cargando...</span>
 </div>
 <script>
-
-        //console.log(containerPrincipal,loader)
+    //envio token y validacion al cargar página//
     (async () => {
         try {
-        const containerPrincipal = document.querySelector("#containerPrincipal")
-        const loader = document.querySelector("#loader")
+            const containerPrincipal = document.querySelector("#containerPrincipal")
+            const loader = document.querySelector("#loader")
             const token = localStorage.getItem("token")
             if (!token) {
                 location.replace("http://localhost:3000/login")
             }
-            console.log(token)
             const { data } = await axios.post("http://localhost:3000/verify", {
                 token: token
             })
-            console.log(data)
             if (!data) {
                 throw new Error("Autenticacion fallida")
             }
-            console.log(data)
-            console.log("pase")
             loader.style.display = "none"
-            console.log("pase2")
             containerPrincipal.style.display = "block"
-
             localStorage.setItem("user", data)
         } catch (error) {
             localStorage.removeItem("token")
@@ -48,6 +44,7 @@
         }
     })()
 
+    //Elementos del DOM
     const btnTweet = document.querySelector("#btn-tweet")
     const sendTweet = document.querySelector(".modal-container > .text-center > .text-center > button")
     const closeModal = document.querySelector("#close-modal")
@@ -55,6 +52,7 @@
     const header = document.querySelector("header")
     const cerrarSesion = document.querySelector("button")
     const inputTweet = document.querySelector("textarea")
+    
     btnTweet.addEventListener("click", () => {
         modal.classList.remove("d-none")
     })
@@ -69,13 +67,11 @@
     })
     cerrarSesion.addEventListener("click", () => {
         localStorage.removeItem("token")
-        location.reload()
+        location.reload("/login")
     })
     sendTweet.addEventListener("click", async () => {
         const tweetContent = `${inputTweet.value}`
         const token = localStorage.getItem("token")
-
-
         try {
             if (!tweetContent) {
                 throw new Error("No se puede crear un tweet sin contenido")
@@ -84,12 +80,10 @@
                 inputTweet.value = ""
                 throw new Error("Longitud máxima sobrepasada")
             }
-
             const { data } = axios.post("http://localhost:3000/home", {
                 token: token,
                 tweet: tweetContent
             })
-
             modal.classList.add("d-none")
             location.reload()
         } catch (error) {

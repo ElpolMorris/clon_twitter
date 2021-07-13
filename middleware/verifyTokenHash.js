@@ -2,10 +2,8 @@ const { compareHash } = require("../utils/bcrypt");
 const { verifyToken } = require("../utils/jwt");
 
 const verifyTokenHash = async(token,getUser)=>{
-    //const data = req.body;
     if(!token){
         throw new Error("token no válido")
-        //res.status(403).send("No posee token valido")
     }
     const { user, password } = verifyToken(token);
     if ((user && password)) {
@@ -14,14 +12,11 @@ const verifyTokenHash = async(token,getUser)=>{
             const isValid = await compareHash(password, passHash);
             if (isValid) {
                 return username
-                //res.status(200).send(username)
             } else {
                 throw new Error("token no válido")
-                //res.status(403).send("No posee token valido");
             }
         } else {
             throw new Error("token no válido")
-            //res.status(403).send("No posee token valido");
         }
     }
 }

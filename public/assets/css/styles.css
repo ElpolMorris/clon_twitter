@@ -20,6 +20,11 @@
     max-width: 800px;
     margin: 0px auto;
 }
+.container-load {
+    width: 100vw;
+    height: 100vh;
+    margin: 0px auto;
+}
 .soft-color {
     background-color: var(--soft-color);
 }
@@ -46,6 +51,10 @@
 }
 .justify-content-between{
     justify-content: space-between;
+}
+.center-layout{
+    justify-content: center;
+    align-items: center;
 }
 
 .f-column {
