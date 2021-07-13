@@ -1,0 +1,64 @@
+{{!-- Vista Register --}}
+<div class="container flex f-column p-3 mobile">
+    <div>
+        {{> Logo
+        hex-color = "#fff"
+        }}
+    </div>
+
+    <h1 class="isLetterWhite">Crea tu cuenta</h1>
+    {{> Form
+    class = "isLetterWhite"
+    }}
+    {{>Button
+    class="btn btn-primary"
+    btn-name= "Registrarse"
+    }}
+</div>
+
+<script>
+    const btnLogin = document.querySelector("button")
+    const inputs = document.querySelectorAll("input")
+
+
+    btnLogin.addEventListener("click", async () => {
+        const [name, email, username, password] = [...inputs].map(({ value }) => value)
+        if (!name || !email || !username || !password) {
+            alert("Se deben llenar todos los campos")
+        } else {
+            const validation = isEmailValidated(email)
+            if (validation) {
+                const registro = await register([`${name}`, `${email}`, `${username}`, `${password}`])
+            }
+            else {
+                alert("Correo no válido")
+            }
+        }
+    })
+    const register = async (dataRegister) => {
+        const [name, email, username, password] = dataRegister
+        try {
+            const data = await axios.post("http://localhost:3000/register", {
+                name: name,
+                email: email,
+                password: password,
+                username: username
+            })
+            if (data.status === 200) {
+                alert("usuario creado con éxito")
+                location.replace("http://localhost:3000/login")
+            }
+        } catch (error) {
+            if (error.response.status === 400) {
+                inputs.forEach( input => input.value = "")
+                alert("Usuario ya registrado")
+            }
+        }
+    }
+    const isEmailValidated = (email) => {
+        if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(email)) {
+            return true
+        }
+        return false
+    }
+</script>

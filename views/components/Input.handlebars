@@ -1,0 +1,10 @@
+<div class="input_form my-2">
+    <label for="{{name-input}}" class="py-1">
+        {{text-label}}
+        {{#if textarea}}
+            <textarea name="{{name-input}}" cols="30" rows="10" class="input-space py-1" required></textarea>
+            {{else}}
+            <input type="{{type-input}}" name="{{name-input}}" class="input-space py-1" required>
+        {{/if}}
+    </label>
+</div>
